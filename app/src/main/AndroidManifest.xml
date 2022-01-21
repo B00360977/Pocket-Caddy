@@ -14,7 +14,7 @@
         android:theme="@style/Theme.GolfApp">
         <activity
             android:name=".HomeActivity"
-            android:exported="false"
+            android:exported="true"
             android:label="@string/title_activity_home"
             android:theme="@style/Theme.GolfApp.NoActionBar" />
         <activity
