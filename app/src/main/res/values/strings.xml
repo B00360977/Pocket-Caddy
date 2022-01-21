@@ -44,6 +44,10 @@
     <string name="view_history">View History</string>
     <string name="title_activity_maps">MapsActivity</string>
     <string name="title_activity_new_round">NewRound</string>
+    <string name="start">Start</string>
+    <string name="name">Name</string>
+    <string name="cancel">Cancel</string>
+    <string name="save">Save</string>
 
 
 </resources>
