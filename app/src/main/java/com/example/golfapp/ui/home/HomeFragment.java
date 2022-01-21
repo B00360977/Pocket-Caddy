@@ -8,18 +8,12 @@ import android.widget.Button;
 import android.widget.TextView;
 
 import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
-import androidx.lifecycle.Observer;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.Navigation;
 
 import com.example.golfapp.GlobalVariables;
 import com.example.golfapp.R;
 import com.example.golfapp.databinding.FragmentHomeBinding;
-import com.example.golfapp.ui.gallery.GalleryFragment;
 
 public class HomeFragment extends Fragment implements View.OnClickListener{
 
