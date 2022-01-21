@@ -19,6 +19,8 @@
             android:theme="@style/Theme.GolfApp.NoActionBar" />
         <activity
             android:name=".ForgotPassword"
+            android:parentActivityName=".Login"
+            android:theme="@style/Theme.GolfApp.NoActionBar"
             android:exported="false" />
         <activity
             android:name=".Register"
