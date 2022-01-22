@@ -19,14 +19,14 @@
         app:layout_constraintHorizontal_bias="0.0"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/cardView"
-        app:layout_constraintVertical_bias="0.086" />
+        app:layout_constraintVertical_bias="0.047" />
 
     <androidx.cardview.widget.CardView
         android:id="@+id/cardView"
         android:layout_width="120dp"
         android:layout_height="120dp"
         android:layout_marginTop="124dp"
-        app:cardBackgroundColor="@color/black"
+        app:cardBackgroundColor="#048741"
         app:cardCornerRadius="200dp"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -37,7 +37,7 @@
             android:layout_height="115dp"
             android:layout_centerHorizontal="true"
             android:layout_gravity="center"
-            app:cardBackgroundColor="#DFDFDF"
+            app:cardBackgroundColor="@color/white"
             app:cardCornerRadius="200dp"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent">
