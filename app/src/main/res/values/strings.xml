@@ -48,6 +48,8 @@
     <string name="name">Name</string>
     <string name="cancel">Cancel</string>
     <string name="save">Save</string>
+    <string name="menu_history">History</string>
+    <string name="menu_settings">Settings</string>
 
 
 </resources>

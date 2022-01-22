@@ -37,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseUser fAuthUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert fAuthUser != null;
         userName = fAuthUser.getDisplayName();
         userEmail = fAuthUser.getEmail();
         uid = fAuthUser.getUid();
@@ -64,8 +65,8 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         View header = navigationView.getHeaderView(0);
-        TextView navSubtitle = (TextView)header.findViewById(R.id.nav_subtitle);
-        TextView navTitle = (TextView)header.findViewById(R.id.nav_title);
+        TextView navSubtitle = header.findViewById(R.id.nav_subtitle);
+        TextView navTitle = header.findViewById(R.id.nav_title);
         navSubtitle.setText(userEmail);
         navTitle.setText(userName);
 
@@ -74,6 +75,7 @@ public class HomeActivity extends AppCompatActivity {
             startActivity(new Intent(getApplicationContext(), Login.class));
             return true;
         });
+
     }
 
 
