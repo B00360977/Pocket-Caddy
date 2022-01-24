@@ -45,7 +45,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     FloatingActionButton fab;
     private FusedLocationProviderClient mLocationClient;
     private Boolean isPermissionGranted;
-    private int GPS_REQUEST_CODE = 9001;
+    private final int GPS_REQUEST_CODE = 9001;
     private LatLng currentLocation;
     private Polyline mPolyline;
 
@@ -57,6 +57,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         checkMapPermission();
         initMap();
         mLocationClient = new FusedLocationProviderClient(this);
+        mLocationClient.getLastLocation().addOnCompleteListener(task -> {
+            if (task.isSuccessful()) {
+                Location location = task.getResult();
+                currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
+        }});
+
     }
 
     private void initMap() {
@@ -65,6 +71,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 // Obtain the SupportMapFragment and get notified when the map is ready to be used.
                 SupportMapFragment mapFragment = (SupportMapFragment) getSupportFragmentManager()
                         .findFragmentById(R.id.map);
+                assert mapFragment != null;
                 mapFragment.getMapAsync(this);
             }
         }
@@ -87,13 +94,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .show();
         }
         return false;
-    }
-
-    private void goToLocation(double latitude, double longitude) {
-        LatLng latLng = new LatLng(latitude, longitude);
-        CameraUpdate cameraUpdate = CameraUpdateFactory.newLatLngZoom(latLng, 18);
-        mMap.moveCamera(cameraUpdate);
-        mMap.setMapType(GoogleMap.MAP_TYPE_SATELLITE);
     }
 
     private void checkMapPermission() {
@@ -140,6 +140,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mMap.setOnMarkerDragListener(new GoogleMap.OnMarkerDragListener() {
             @Override
             public void onMarkerDragStart(Marker marker) {
+                mPolyline.remove();
             }
 
             @Override
@@ -151,6 +152,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng latLng = marker.getPosition();
                 marker.setPosition(latLng);
                 addRoute(latLng);
+                calculateDistance(latLng);
             }
         });
     }
@@ -164,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         addRoute(latLng);
+        calculateDistance(latLng);
     }
 
     @SuppressLint("MissingPermission")
@@ -180,6 +183,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                         .add(currentLocation, latlng));
             }
         });
+    }
+
+    public void calculateDistance(LatLng latLng) {
+        float[] results = new float[3];
+        Location.distanceBetween(currentLocation.latitude,currentLocation.longitude,latLng.latitude,latLng.longitude,results);
+        System.out.println(results[0] + "in meters");
+        float distance = (float) (Math.round(results[0]) * 1.09);
+        int dis = ((int) distance);
+        System.out.println(dis + " yrds now");
+
     }
 
     @Override
