@@ -3,6 +3,7 @@ package com.example.golfapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
 
 import android.Manifest;
@@ -13,6 +14,13 @@ import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.Menu;
+import android.view.MenuItem;
+import android.view.View;
+import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.Spinner;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
@@ -48,12 +56,20 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private final int GPS_REQUEST_CODE = 9001;
     private LatLng currentLocation;
     private Polyline mPolyline;
+    private TextView distanceText;
+    private int holeNumber = 1;
+    Spinner clubChoiceDropDown;
+    Button nextHoleBtn, nextShotBtn;
 
+
+    @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
+        setActionBar(binding.toolbar);
+        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber);
         checkMapPermission();
         initMap();
         mLocationClient = new FusedLocationProviderClient(this);
@@ -62,7 +78,69 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 Location location = task.getResult();
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }});
+        distanceText = findViewById(R.id.yrdsText);
+        clubChoiceDropDown = findViewById(R.id.spinner);
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.golf_clubs_array, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        clubChoiceDropDown.setAdapter(adapter);
+        fab = findViewById(R.id.floatingActionButton2);
+        fab.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                createRecommendationPopup();
+            }
+        });
+        nextHoleBtn = findViewById(R.id.nextHoleBtn);
+        nextShotBtn = findViewById(R.id.nextShotBtn);
+        nextHoleBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextHole();
+            }
+        });
 
+    }
+
+    public void nextHole() {
+        holeNumber = holeNumber + 1;
+        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber);
+    }
+
+    public void createRecommendationPopup() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Golf Club Recommendation")
+                .setMessage("Pocket Caddy recommends for a 140yds shot you should use a 7 Iron")
+                .setPositiveButton("Okay", ((dialogInterface, i) -> {
+                    dialogInterface.dismiss();
+                }))
+                .setCancelable(true)
+                .show();
+    }
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.quit, menu);
+        return true;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        if (item.getItemId() == R.id.quitBtn) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setTitle("Confirm Quit")
+                    .setMessage("Your progress will be lost")
+                    .setPositiveButton("Yes", ((dialogInterface, i) -> {
+                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                    }))
+                    .setNegativeButton("No", ((dialogInterface, i) -> {
+                        dialogInterface.cancel();
+                    }))
+                    .setCancelable(true)
+                    .show();
+            return true;
+        }
+        return super.onOptionsItemSelected(item);
     }
 
     private void initMap() {
@@ -100,7 +178,6 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                Toast.makeText(MapsActivity.this, "Permission Granted", Toast.LENGTH_SHORT).show();
                 isPermissionGranted = true;
             }
 
@@ -192,6 +269,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         float distance = (float) (Math.round(results[0]) * 1.09);
         int dis = ((int) distance);
         System.out.println(dis + " yrds now");
+        distanceText.setText(dis + " yds");
 
     }
 
