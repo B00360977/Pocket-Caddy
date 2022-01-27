@@ -57,6 +57,8 @@
     <string name="next_hole">Next Hole</string>
     <string name="yds">- yds</string>
     <string name="select_club">Select Club</string>
+    <string name="select_your_course_below">Select your course below</string>
+    <string name="add_course">Add course</string>
 
 
 </resources>

@@ -57,7 +57,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private LatLng currentLocation;
     private Polyline mPolyline;
     private TextView distanceText;
-    private int holeNumber = 1;
+    private int holeNumber = 1, shotNumber = 1;
     Spinner clubChoiceDropDown;
     Button nextHoleBtn, nextShotBtn;
 
@@ -69,7 +69,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setActionBar(binding.toolbar);
-        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber);
+        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot " + shotNumber);
         checkMapPermission();
         initMap();
         mLocationClient = new FusedLocationProviderClient(this);
@@ -98,12 +98,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 nextHole();
             }
         });
+        nextShotBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                nextShot();
+            }
+        });
 
+    }
+
+    public void nextShot() {
+        shotNumber = shotNumber + 1;
+        Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
+        setTitle();
     }
 
     public void nextHole() {
         holeNumber = holeNumber + 1;
-        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber);
+        shotNumber = 1;
+        Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
+        setTitle();
+    }
+
+    public void setTitle() {
+        getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot "+ shotNumber);
     }
 
     public void createRecommendationPopup() {
