@@ -110,6 +110,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public void nextShot() {
         shotNumber = shotNumber + 1;
         Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
+        resetSpinner();
         setTitle();
     }
 
@@ -117,7 +118,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         holeNumber = holeNumber + 1;
         shotNumber = 1;
         Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
+        resetSpinner();
         setTitle();
+    }
+
+    public void resetSpinner() {
+        clubChoiceDropDown.setSelection(0);
     }
 
     public void setTitle() {
