@@ -154,8 +154,10 @@
             android:layout_gravity="center"
             android:elevation="16dp"
 
+            android:fontFamily="@font/roboto_mono"
             android:text="7I"
-            android:textColor="@android:color/white" />
+            android:textColor="@android:color/white"
+            android:textStyle="bold" />
 
     </FrameLayout>
 
