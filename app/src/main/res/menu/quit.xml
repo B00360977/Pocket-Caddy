@@ -5,5 +5,6 @@
     <item
         android:title="@string/quit"
         android:id="@+id/quitBtn"
-        app:showAsAction="never"/>
+        android:icon="@drawable/ic_baseline_login_24"
+        app:showAsAction="ifRoom"/>
 </menu>

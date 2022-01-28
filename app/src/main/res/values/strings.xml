@@ -59,6 +59,7 @@
     <string name="select_club">Select Club</string>
     <string name="select_your_course_below">Select your course below</string>
     <string name="add_course">Add course</string>
+    <string name="search">Search</string>
 
 
 </resources>

@@ -3,9 +3,7 @@ package com.example.golfapp;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.widget.Toolbar;
 import androidx.fragment.app.FragmentActivity;
-
 import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
@@ -19,6 +17,7 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -26,8 +25,6 @@ import android.widget.Toast;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
-import com.google.android.gms.maps.CameraUpdate;
-import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -46,6 +43,9 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
@@ -58,9 +58,10 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     private Polyline mPolyline;
     private TextView distanceText;
     private int holeNumber = 1, shotNumber = 1;
+    private String clubRecommendation = "", distance = "";
+    Map<String, String> map;
     Spinner clubChoiceDropDown;
     Button nextHoleBtn, nextShotBtn;
-
 
     @SuppressLint("MissingPermission")
     @Override
@@ -79,7 +80,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }});
         distanceText = findViewById(R.id.yrdsText);
-        clubChoiceDropDown = findViewById(R.id.spinner);
+        clubChoiceDropDown = (Spinner) findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.golf_clubs_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         clubChoiceDropDown.setAdapter(adapter);
@@ -105,13 +106,59 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             }
         });
 
+        map = new HashMap<String, String>();
+        map.put("D", "Driver");
+        map.put("1W", "1 Wood");
+        map.put("2W", "2 Wood");
+        map.put("3W", "3 Wood");
+        map.put("4W", "4 Wood");
+        map.put("5W", "5 Wood");
+        map.put("6W", "6 Wood");
+        map.put("7W", "7 Wood");
+        map.put("3H", "3 Hybrid");
+        map.put("4H", "4 Hybrid");
+        map.put("5H", "5 Hybrid");
+        map.put("1I", "1 Iron");
+        map.put("2I", "2 Iron");
+        map.put("3I", "3 Iron");
+        map.put("4I", "4 Iron");
+        map.put("5I", "5 Iron");
+        map.put("6I", "6 Iron");
+        map.put("7I", "7 Iron");
+        map.put("8I", "8 Iron");
+        map.put("9I", "9 Iron");
+        map.put("PW", "Pitching Wedge");
+        map.put("SW", "Sand Wedge");
+        map.put("LW", "Lob Wedge");
+        map.put("P", "Putter");
+
+    }
+
+    @Override
+    public void onBackPressed() {
+        AlertDialog alertDialog = new AlertDialog.Builder(this)
+                .setTitle("Confirm Quit")
+                .setMessage("Your progress will be lost")
+                .setPositiveButton("Yes", ((dialogInterface, i) -> {
+                    startActivity(new Intent(getApplicationContext(), HomeActivity.class));
+                }))
+                .setNegativeButton("No", ((dialogInterface, i) -> {
+                    dialogInterface.cancel();
+                }))
+                .setCancelable(true)
+                .show();
     }
 
     public void nextShot() {
-        shotNumber = shotNumber + 1;
-        Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
-        resetSpinner();
-        setTitle();
+        if (!clubChoiceDropDown.getSelectedItem().toString().equals("Select Club")) {
+            shotNumber = shotNumber + 1;
+            Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
+            resetSpinner();
+            mMap.clear();
+            setTitle();
+        } else {
+            Toast.makeText(this, "Please select a club", Toast.LENGTH_SHORT).show();
+        }
     }
 
     public void nextHole() {
@@ -119,6 +166,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         shotNumber = 1;
         Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
         resetSpinner();
+        mMap.clear();
         setTitle();
     }
 
@@ -131,14 +179,25 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     }
 
     public void createRecommendationPopup() {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
-                .setTitle("Golf Club Recommendation")
-                .setMessage("Pocket Caddy recommends for a 140yds shot you should use a 7 Iron")
-                .setPositiveButton("Okay", ((dialogInterface, i) -> {
-                    dialogInterface.dismiss();
-                }))
-                .setCancelable(true)
-                .show();
+        if (!distance.equals("")) {
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setTitle("Golf Club Recommendation")
+                    .setMessage("Pocket Caddy recommends for a " + distance + " yds shot you should use a " + clubRecommendation)
+                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                    }))
+                    .setCancelable(true)
+                    .show();
+        } else {
+            AlertDialog alertDialog = new AlertDialog.Builder(this)
+                    .setTitle("Golf Club Recommendation")
+                    .setMessage("To get a recommendation you must select a distance")
+                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> {
+                        dialogInterface.dismiss();
+                    }))
+                    .setCancelable(true)
+                    .show();
+        }
     }
 
     @Override
@@ -294,6 +353,13 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         int dis = ((int) distance);
         System.out.println(dis + " yrds now");
         distanceText.setText(dis + " yds");
+        getRecommendation(dis);
+    }
+
+    public void getRecommendation(int dis) {
+        TextView recommendation = findViewById(R.id.recommendationText);
+        clubRecommendation = map.get("7I");
+        distance = String.valueOf(dis);
 
     }
 
