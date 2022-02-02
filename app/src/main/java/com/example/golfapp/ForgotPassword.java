@@ -1,13 +1,17 @@
 package com.example.golfapp;
 
 import androidx.annotation.NonNull;
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.content.res.ResourcesCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
 
@@ -21,6 +25,7 @@ public class ForgotPassword extends AppCompatActivity {
     Button mResetBtn;
     ProgressBar progressBar;
     FirebaseAuth fAuth;
+    ImageButton mBackBtn;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -31,6 +36,12 @@ public class ForgotPassword extends AppCompatActivity {
         progressBar = findViewById(R.id.progressBar2);
         fAuth = FirebaseAuth.getInstance();
         mResetBtn = findViewById(R.id.resetButton);
+
+        androidx.appcompat.widget.Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar2);
+        setSupportActionBar(myToolbar);
+        ActionBar actionBar = getSupportActionBar();
+        assert actionBar != null;
+        actionBar.setDisplayHomeAsUpEnabled(true);
 
         mResetBtn.setOnClickListener(new View.OnClickListener() {
             @Override

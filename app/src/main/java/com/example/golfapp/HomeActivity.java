@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.provider.Settings;
 import android.view.View;
 import android.view.Menu;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.google.android.material.snackbar.Snackbar;
@@ -36,6 +37,7 @@ public class HomeActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         FirebaseUser fAuthUser = FirebaseAuth.getInstance().getCurrentUser();
+        assert fAuthUser != null;
         userName = fAuthUser.getDisplayName();
         userEmail = fAuthUser.getEmail();
         uid = fAuthUser.getUid();
@@ -49,13 +51,6 @@ public class HomeActivity extends AppCompatActivity {
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarHome.toolbar);
-        binding.appBarHome.fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
-                        .setAction("Action", null).show();
-            }
-        });
 
         DrawerLayout drawer = binding.drawerLayout;
         NavigationView navigationView = binding.navView;
@@ -70,20 +65,26 @@ public class HomeActivity extends AppCompatActivity {
         NavigationUI.setupWithNavController(navigationView, navController);
 
         View header = navigationView.getHeaderView(0);
-        TextView navSubtitle = (TextView)header.findViewById(R.id.nav_subtitle);
-        TextView navTitle = (TextView)header.findViewById(R.id.nav_title);
+        TextView navSubtitle = header.findViewById(R.id.nav_subtitle);
+        TextView navTitle = header.findViewById(R.id.nav_title);
         navSubtitle.setText(userEmail);
         navTitle.setText(userName);
-
 
         navigationView.getMenu().findItem(R.id.nav_logout).setOnMenuItemClickListener(menuItem -> {
             FirebaseAuth.getInstance().signOut();
             startActivity(new Intent(getApplicationContext(), Login.class));
             return true;
         });
+
     }
 
-
+    @Override
+    public void onBackPressed() {
+        Intent intent = new Intent(Intent.ACTION_MAIN);
+        intent.addCategory(Intent.CATEGORY_HOME);
+        intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent);
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
