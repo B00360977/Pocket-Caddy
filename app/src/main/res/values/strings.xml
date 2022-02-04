@@ -60,6 +60,9 @@
     <string name="select_your_course_below">Select your course below</string>
     <string name="add_course">Add course</string>
     <string name="search">Search</string>
+    <string name="end_date">End Date</string>
+    <string name="start_date">Start Date</string>
+    <string name="start_shot">Start Shot</string>
 
 
 </resources>

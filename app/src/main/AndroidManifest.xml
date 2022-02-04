@@ -19,6 +19,9 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.GolfApp">
         <activity
+            android:name=".SearchResultActivity"
+            android:exported="false" />
+        <activity
             android:name=".SplashScreen"
             android:exported="true">
             <intent-filter>
@@ -42,10 +45,9 @@
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="${MAPS_API_KEY}" />
-
         <meta-data
             android:name="com.google.android.gms.version"
-            android:value="@integer/google_play_services_version"/>
+            android:value="@integer/google_play_services_version" />
 
         <activity
             android:name=".MapsActivity"
@@ -63,7 +65,7 @@
             android:theme="@style/Theme.GolfApp.NoActionBar" />
         <activity
             android:name=".Register"
-            android:exported="true"/>
+            android:exported="true" />
         <activity
             android:name=".Login"
             android:exported="true" />

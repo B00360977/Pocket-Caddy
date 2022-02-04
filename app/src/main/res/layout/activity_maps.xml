@@ -103,7 +103,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="31dp"
         android:background="@drawable/rounded_button"
-        android:text="@string/next_shot"
+        android:text="@string/start_shot"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
