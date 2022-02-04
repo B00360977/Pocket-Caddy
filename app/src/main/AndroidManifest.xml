@@ -16,6 +16,7 @@
         android:icon="@mipmap/ic_app_launcher_logo"
         android:label="@string/app_name"
         android:roundIcon="@mipmap/ic_app_launcher_logo_round"
+        android:usesCleartextTraffic="true"
         android:supportsRtl="true"
         android:theme="@style/Theme.GolfApp">
         <activity

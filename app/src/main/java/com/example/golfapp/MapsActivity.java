@@ -13,6 +13,7 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
 import android.view.Menu;
@@ -25,6 +26,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
@@ -51,6 +53,9 @@ import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
 
+import org.json.JSONException;
+
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -215,7 +220,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (!distance.equals("")) {
             AlertDialog alertDialog = new AlertDialog.Builder(this)
                     .setTitle("Golf Club Recommendation")
-                    .setMessage("Pocket Caddy recommends for a " + distance + " yds shot you should use a " + clubRecommendation)
+                    .setMessage("Pocket Caddy recommends for a " + distance + " yds shot you should use a " + map.get(clubRecommendation))
                     .setPositiveButton("Thanks!", ((dialogInterface, i) -> {
                         dialogInterface.dismiss();
                     }))
@@ -345,7 +350,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng latLng = marker.getPosition();
                 marker.setPosition(latLng);
                 addRoute(latLng);
-                calculateDistance(latLng);
+                try {
+                    calculateDistance(latLng);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
         startLocationUpdates();
@@ -360,7 +369,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         addRoute(latLng);
-        calculateDistance(latLng);
+        try {
+            calculateDistance(latLng);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -379,20 +392,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void calculateDistance(LatLng latLng) {
+    public void calculateDistance(LatLng latLng) throws JSONException {
         float[] results = new float[3];
         Location.distanceBetween(currentLocation.latitude,currentLocation.longitude,latLng.latitude,latLng.longitude,results);
-        float distance = (float) (Math.round(results[0]) * 1.09);
-        int dis = ((int) distance);
+        float distanceYds = (float) (Math.round(results[0]) * 1.09);
+        int dis = ((int) distanceYds);
+        distance = String.valueOf(dis);
         distanceText.setText(dis + " yds");
         getRecommendation(dis);
     }
 
-    public void getRecommendation(int dis) {
-        TextView recommendation = findViewById(R.id.recommendationText);
-        clubRecommendation = map.get("7I");
-        distance = String.valueOf(dis);
+    public void getRecommendation(int dis) throws JSONException {
+        PayloadGenerator payloadGenerator = new PayloadGenerator();
+        JsonObjectRequest jsonObjectRequest = payloadGenerator.createJSONPayload(distance);
+        RecommendationAPI.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        updateRecommendation();
+    }
 
+    public void updateRecommendation() {
+        Handler handler= new Handler();
+        handler.postDelayed(new Runnable() {
+            @Override
+            public void run() {
+                TextView recommendation = findViewById(R.id.recommendationText);
+                clubRecommendation = GlobalVariables.getInstance().getRecommendation();
+                recommendation.setText(clubRecommendation);
+            }
+        }, 1000);
     }
 
     @Override
