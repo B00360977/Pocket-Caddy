@@ -62,7 +62,13 @@
     <string name="search">Search</string>
     <string name="end_date">End Date</string>
     <string name="start_date">Start Date</string>
-    <string name="start_shot">Start Shot</string>
+    <string name="start_shot">Start Shot </string>
+    <string name="home">Home</string>
+    <string name="round_completed">Round Completed</string>
+    <string name="you_can_few_this_round_in_the_history_section">You can few this round in the History section</string>
+    <string name="green_check_mark">Green Check Mark</string>
+    <string name="finish_round">Finish Round</string>
+    <string name="finish_shot">"Finish Shot "</string>
 
 
 </resources>

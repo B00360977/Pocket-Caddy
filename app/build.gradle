@@ -46,6 +46,7 @@ dependencies {
     implementation 'com.google.android.libraries.places:places:2.4.0'
     implementation 'com.karumi:dexter:6.2.2'
     implementation 'androidx.compose.ui:ui-tooling-data:1.0.0-beta04'
+    implementation files('C:\\Users\\kk_17\\AndroidStudioProjects\\GolfApp\\app\\libs\\jtds-1.3.1.jar')
     testImplementation 'junit:junit:4.+'
     androidTestImplementation 'androidx.test.ext:junit:1.1.2'
     androidTestImplementation 'androidx.test.espresso:espresso-core:3.3.0'

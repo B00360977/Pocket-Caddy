@@ -123,8 +123,8 @@ public class HistoryFragment extends Fragment {
             Toast.makeText(getContext(), "Start Date must be before End Date", Toast.LENGTH_SHORT).show();
         } else {
             Intent i = new Intent(getActivity(), SearchResultActivity.class);
-            i.putExtra("startDate", startDateFormat);
-            i.putExtra("endDate", endDateFormat);
+            i.putExtra("startDate", startDateFormat.toString());
+            i.putExtra("endDate", endDateFormat.toString());
             startActivity(i);
         }
     }
