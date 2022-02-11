@@ -61,9 +61,9 @@ public class HistoryFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                         month = month + 1;
-                        startDate.setText(day + "/" + month + "/" + year);
+                        startDate.setText(year + "-" + month + "-" + day);
                         try {
-                            startDateFormat = new SimpleDateFormat("dd/MM/yyy").parse(day + "/" + month + "/" + year);
+                            startDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(year + "-" + month + "-" + day);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -87,9 +87,9 @@ public class HistoryFragment extends Fragment {
                     @Override
                     public void onDateSet(DatePicker datePicker, int year, int month, int day) {
                         month = month + 1;
-                        endDate.setText(day + "/" + month + "/" + year);
+                        endDate.setText(year + "-" + month + "-" + day);
                         try {
-                            endDateFormat = new SimpleDateFormat("dd/MM/yyy").parse(day + "/" + month + "/" + year);
+                            endDateFormat = new SimpleDateFormat("yyyy-MM-dd").parse(year + "-" + month + "-" + day);
                         } catch (ParseException e) {
                             e.printStackTrace();
                         }
@@ -105,14 +105,14 @@ public class HistoryFragment extends Fragment {
         searchBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                getSearchResults();
+                goToResults();
             }
         });
 
         return  root;
     }
 
-    private void getSearchResults() {
+    private void goToResults() {
         if (startDate.getText().toString().isEmpty()) {
             Toast.makeText(getContext(), "Start Date cannot be empty", Toast.LENGTH_SHORT).show();
             startDate.setError("Start Date Required");
@@ -123,8 +123,8 @@ public class HistoryFragment extends Fragment {
             Toast.makeText(getContext(), "Start Date must be before End Date", Toast.LENGTH_SHORT).show();
         } else {
             Intent i = new Intent(getActivity(), SearchResultActivity.class);
-            i.putExtra("startDate", startDateFormat.toString());
-            i.putExtra("endDate", endDateFormat.toString());
+            i.putExtra("startDate", startDate.getText());
+            i.putExtra("endDate", endDate.getText());
             startActivity(i);
         }
     }
