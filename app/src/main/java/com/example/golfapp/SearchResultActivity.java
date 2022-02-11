@@ -8,6 +8,7 @@ import android.app.FragmentTransaction;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.graphics.Color;
+import android.graphics.Typeface;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
@@ -70,6 +71,10 @@ public class SearchResultActivity extends AppCompatActivity {
                     tv2.setGravity(Gravity.CENTER);
                     tv3.setGravity(Gravity.CENTER);
 
+                    tv1.setTypeface(null, Typeface.BOLD);
+                    tv2.setTypeface(null, Typeface.BOLD);
+                    tv3.setTypeface(null, Typeface.BOLD);
+
                     tv1.setTextColor(Color.BLACK);
                     tv2.setTextColor(Color.BLACK);
                     tv3.setTextColor(Color.BLACK);
@@ -98,6 +103,11 @@ public class SearchResultActivity extends AppCompatActivity {
                     });
 
                     tableLayout.addView(tableRow);
+
+                    View line = new View(this);
+                    line.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 2));
+                    line.setBackgroundColor(Color.rgb(51, 51, 51));
+                    tableLayout.addView(line);
 
                 } catch (SQLException throwables) {
                     throwables.printStackTrace();

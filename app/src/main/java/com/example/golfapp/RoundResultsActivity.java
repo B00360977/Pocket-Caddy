@@ -146,6 +146,11 @@ public class RoundResultsActivity extends AppCompatActivity {
 
                 tableLayout.addView(tableRow);
 
+                View line = new View(this);
+                line.setLayoutParams(new TableRow.LayoutParams(TableRow.LayoutParams.MATCH_PARENT, 2));
+                line.setBackgroundColor(Color.rgb(51, 51, 51));
+                tableLayout.addView(line);
+
             } catch (SQLException throwables) {
                 throwables.printStackTrace();
             }
