@@ -69,6 +69,10 @@
     <string name="green_check_mark">Green Check Mark</string>
     <string name="finish_round">Finish Round</string>
     <string name="finish_shot">"Finish Shot "</string>
+    <string name="update_account_name">Update Account Name</string>
+    <string name="update_email">Update Email</string>
+    <string name="update_password">Update Password</string>
+    <string name="account_name">Account Name</string>
 
 
 </resources>

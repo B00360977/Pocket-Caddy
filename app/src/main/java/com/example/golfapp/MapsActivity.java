@@ -4,10 +4,16 @@ import static com.google.android.gms.location.LocationServices.getFusedLocationP
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
+import androidx.core.app.ActivityCompat;
+import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
+import android.app.Activity;
+import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
@@ -76,7 +82,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         setContentView(binding.getRoot());
         setActionBar(binding.toolbar);
         getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot " + shotNumber);
-        checkMapPermission();
+        try {
+            checkMapPermission();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
         initMap();
         mLocationClient = new FusedLocationProviderClient(this);
         mLocationClient.getLastLocation().addOnCompleteListener(task -> {
@@ -276,15 +286,42 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
-    private void checkMapPermission() {
+    private void checkMapPermission() throws InterruptedException {
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+
+            if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.ACCESS_FINE_LOCATION)) {
+
+                new AlertDialog.Builder(this)
+                        .setTitle("Grant Location Permission")
+                        .setMessage("Pocket Caddy needs your location to record distances")
+                        .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
+                            @Override
+                            public void onClick(DialogInterface dialogInterface, int i) {
+                                ActivityCompat.requestPermissions(MapsActivity.this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 99);
+                            }
+                        }).create().show();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, 99);
+            }
+            isPermissionGranted = false;
+        } else {
+            isPermissionGranted = true;
+        }
+
+        /*
+
         Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
             @Override
             public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
                 isPermissionGranted = true;
+                System.out.println("##################################################");
+                System.out.println(isPermissionGranted);
             }
 
             @Override
             public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
+                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
                 Intent intent = new Intent();
                 intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
                 Uri uri = Uri.fromParts("package", getPackageName(), "");
@@ -297,6 +334,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 permissionToken.continuePermissionRequest();
             }
         }).check();
+
+         */
     }
 
     /**
@@ -396,7 +435,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
             TextView recommendation = findViewById(R.id.recommendationText);
             clubRecommendation = GlobalVariables.getInstance().getRecommendation();
             recommendation.setText(clubRecommendation);
-        }, 1000);
+        }, 1200);
     }
 
     @Override

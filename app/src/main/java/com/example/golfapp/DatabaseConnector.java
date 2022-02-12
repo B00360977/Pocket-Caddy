@@ -14,8 +14,8 @@ public class DatabaseConnector {
 
         ip = "pocket-caddy.database.windows.net";
         database = "pocket-caddy-db";
-        pass = "Aardvark1";
-        uname = "pocketCaddyAdmin";
+        pass = BuildConfig.DATABASE_PASSWORD;
+        uname = BuildConfig.DATABASE_USERNAME;
         port = "1433";
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();

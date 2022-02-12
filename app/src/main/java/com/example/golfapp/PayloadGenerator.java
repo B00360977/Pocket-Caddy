@@ -1,5 +1,7 @@
 package com.example.golfapp;
 
+import android.util.Log;
+
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
@@ -38,12 +40,11 @@ public class PayloadGenerator {
                     e.printStackTrace();
                 }
                 GlobalVariables.getInstance().setRecommendation(responseText);
-                System.out.println(responseText);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //handles error in response
+                Log.e("Error", error.getMessage());
             }
         });
         return jsonObjectRequest;

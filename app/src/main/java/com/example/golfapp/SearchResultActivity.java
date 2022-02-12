@@ -46,10 +46,17 @@ public class SearchResultActivity extends AppCompatActivity {
         }
 
         ResultSet data = getSearchResults(startDate, endDate);
-
         if (data != null) {
 
             createBaseTable();
+
+            try {
+                if (!data.next()) {
+                    noSearchResult();
+                }
+            } catch (SQLException throwables) {
+                throwables.printStackTrace();
+            }
 
             while (true) {
 
@@ -134,7 +141,7 @@ public class SearchResultActivity extends AppCompatActivity {
                 .setPositiveButton("Okay", new DialogInterface.OnClickListener() {
                     @Override
                     public void onClick(DialogInterface dialogInterface, int i) {
-                        getSupportFragmentManager().beginTransaction().replace(R.id.container, new HistoryFragment()).commit();
+                        finish();
                     }
                 })
                 .setCancelable(false)
