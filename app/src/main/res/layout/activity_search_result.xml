@@ -7,6 +7,11 @@
     android:background="@drawable/app_background"
     tools:context=".SearchResultActivity">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_overlay"/>
+
     <ScrollView
         android:id="@+id/scrollView1"
         android:layout_width="match_parent"

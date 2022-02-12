@@ -130,20 +130,17 @@ public class RoundResultsActivity extends AppCompatActivity {
                 tableRow.addView(tv1);
                 tableRow.addView(tv2);
 
-                /*
                 tableRow.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View view) {
-                        System.out.println("move to new screen");
-                        Intent i = new Intent(getApplicationContext(), RoundResultsActivity.class);
+                        Intent i = new Intent(getApplicationContext(), HoleResultsActivity.class);
                         i.putExtra("roundID", roundID);
                         i.putExtra("holeNumber", tv1.getText());
+                        i.putExtra("courseName", courseName);
+                        i.putExtra("roundDate", roundDate);
                         startActivity(i);
                     }
                 });
-
-                 */
-
                 tableLayout.addView(tableRow);
 
                 View line = new View(this);
