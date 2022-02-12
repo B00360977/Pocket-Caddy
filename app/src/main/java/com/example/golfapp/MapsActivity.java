@@ -1,5 +1,6 @@
 package com.example.golfapp;
 
+import static com.google.android.gms.location.LocationServices.getFusedLocationProviderClient;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
@@ -11,20 +12,24 @@ import android.location.Location;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Looper;
 import android.provider.Settings;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-
+import com.android.volley.toolbox.JsonObjectRequest;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationCallback;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationResult;
+import com.google.android.gms.location.LocationSettingsRequest;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -42,23 +47,23 @@ import com.karumi.dexter.listener.PermissionDeniedResponse;
 import com.karumi.dexter.listener.PermissionGrantedResponse;
 import com.karumi.dexter.listener.PermissionRequest;
 import com.karumi.dexter.listener.single.PermissionListener;
-
+import org.json.JSONException;
 import java.util.HashMap;
 import java.util.Map;
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
-    private ActivityMapsBinding binding;
     FloatingActionButton fab;
     private FusedLocationProviderClient mLocationClient;
     private Boolean isPermissionGranted;
     private final int GPS_REQUEST_CODE = 9001;
-    private LatLng currentLocation;
+    private LatLng currentLocation, startLocation, endLocation;
     private Polyline mPolyline;
     private TextView distanceText;
     private int holeNumber = 1, shotNumber = 1;
     private String clubRecommendation = "", distance = "";
+    private LocationRequest mLocationRequest;
     Map<String, String> map;
     Spinner clubChoiceDropDown;
     Button nextHoleBtn, nextShotBtn;
@@ -67,7 +72,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        binding = ActivityMapsBinding.inflate(getLayoutInflater());
+        com.example.golfapp.databinding.ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
         setActionBar(binding.toolbar);
         getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot " + shotNumber);
@@ -76,37 +81,36 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         mLocationClient = new FusedLocationProviderClient(this);
         mLocationClient.getLastLocation().addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
-                Location location = task.getResult();
+                Location location;
+                location = task.getResult();
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }});
         distanceText = findViewById(R.id.yrdsText);
-        clubChoiceDropDown = (Spinner) findViewById(R.id.spinner);
+        clubChoiceDropDown = findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.golf_clubs_array, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         clubChoiceDropDown.setAdapter(adapter);
         fab = findViewById(R.id.floatingActionButton2);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                createRecommendationPopup();
-            }
-        });
+        fab.setOnClickListener(view -> createRecommendationPopup());
         nextHoleBtn = findViewById(R.id.nextHoleBtn);
         nextShotBtn = findViewById(R.id.nextShotBtn);
-        nextHoleBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
+        nextShotBtn.setText("Start Shot " + shotNumber);
+        nextHoleBtn.setOnClickListener(view -> {
+            if (nextShotBtn.getText().toString().contains("Finish")) {
+                Toast.makeText(getApplicationContext(), "Please finish current shot before moving to the next hole", Toast.LENGTH_SHORT).show();
+            } else {
                 nextHole();
             }
         });
-        nextShotBtn.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                nextShot();
+        nextShotBtn.setOnClickListener(view -> {
+            if (nextShotBtn.getText().toString().contains("Start Shot")) {
+                startShot();
+            } else {
+                finishShot();
             }
         });
 
-        map = new HashMap<String, String>();
+        map = new HashMap<>();
         map.put("D", "Driver");
         map.put("1W", "1 Wood");
         map.put("2W", "2 Wood");
@@ -136,38 +140,61 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     @Override
     public void onBackPressed() {
-        AlertDialog alertDialog = new AlertDialog.Builder(this)
+        new AlertDialog.Builder(this)
                 .setTitle("Confirm Quit")
                 .setMessage("Your progress will be lost")
-                .setPositiveButton("Yes", ((dialogInterface, i) -> {
-                    startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                }))
-                .setNegativeButton("No", ((dialogInterface, i) -> {
-                    dialogInterface.cancel();
-                }))
+                .setPositiveButton("Yes", ((dialogInterface, i) -> startActivity(new Intent(getApplicationContext(), HomeActivity.class))))
+                .setNegativeButton("No", ((dialogInterface, i) -> dialogInterface.cancel()))
                 .setCancelable(true)
                 .show();
     }
 
-    public void nextShot() {
+    public void startShot() {
         if (!clubChoiceDropDown.getSelectedItem().toString().equals("Select Club")) {
+            startLocation = currentLocation;
+            nextShotBtn.setText("Finish Shot " + shotNumber);
+            nextShotBtn.setBackgroundColor(getResources().getColor(R.color.quantum_googred));
+        } else {
+            Toast.makeText(this, "Please select a club", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void finishShot() {
+        if (!clubChoiceDropDown.getSelectedItem().toString().equals("Select Club")) {
+            endLocation = currentLocation;
             shotNumber = shotNumber + 1;
             Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
             resetSpinner();
             mMap.clear();
             setTitle();
+            nextShotBtn.setText("Start Shot " + shotNumber);
+            nextShotBtn.setBackgroundColor(android.graphics.Color.parseColor("#048741"));
         } else {
             Toast.makeText(this, "Please select a club", Toast.LENGTH_SHORT).show();
         }
     }
 
     public void nextHole() {
-        holeNumber = holeNumber + 1;
-        shotNumber = 1;
-        Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
-        resetSpinner();
-        mMap.clear();
-        setTitle();
+        if (holeNumber == 18) {
+            new AlertDialog.Builder(this)
+                    .setTitle("Confirm Round Complete")
+                    .setMessage("Please confirm you have finished your round")
+                    .setPositiveButton("Yes", ((dialogInterface, i) -> startActivity(new Intent(getApplicationContext(), EndScreen.class))))
+                    .setNegativeButton("No", ((dialogInterface, i) -> dialogInterface.cancel()))
+                    .setCancelable(true)
+                    .show();
+        } else {
+            if (holeNumber == 17) {
+                nextHoleBtn.setText(R.string.finish_round);
+            }
+            holeNumber = holeNumber + 1;
+            shotNumber = 1;
+            Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
+            resetSpinner();
+            nextShotBtn.setText("Start Shot " + shotNumber);
+            mMap.clear();
+            setTitle();
+        }
     }
 
     public void resetSpinner() {
@@ -180,21 +207,17 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
 
     public void createRecommendationPopup() {
         if (!distance.equals("")) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Golf Club Recommendation")
-                    .setMessage("Pocket Caddy recommends for a " + distance + " yds shot you should use a " + clubRecommendation)
-                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    }))
+                    .setMessage("Pocket Caddy recommends for a " + distance + " yds shot you should use a " + map.get(clubRecommendation))
+                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> dialogInterface.dismiss()))
                     .setCancelable(true)
                     .show();
         } else {
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Golf Club Recommendation")
                     .setMessage("To get a recommendation you must select a distance")
-                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> {
-                        dialogInterface.dismiss();
-                    }))
+                    .setPositiveButton("Thanks!", ((dialogInterface, i) -> dialogInterface.dismiss()))
                     .setCancelable(true)
                     .show();
         }
@@ -210,15 +233,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == R.id.quitBtn) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("Confirm Quit")
                     .setMessage("Your progress will be lost")
-                    .setPositiveButton("Yes", ((dialogInterface, i) -> {
-                        startActivity(new Intent(getApplicationContext(), HomeActivity.class));
-                    }))
-                    .setNegativeButton("No", ((dialogInterface, i) -> {
-                        dialogInterface.cancel();
-                    }))
+                    .setPositiveButton("Yes", ((dialogInterface, i) -> startActivity(new Intent(getApplicationContext(), HomeActivity.class))))
+                    .setNegativeButton("No", ((dialogInterface, i) -> dialogInterface.cancel()))
                     .setCancelable(true)
                     .show();
             return true;
@@ -244,7 +263,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (providerEnabled) {
             return true;
         } else {
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
+            new AlertDialog.Builder(this)
                     .setTitle("GPS Permission")
                     .setMessage("GPS is required for this app to work. Please enable GPS")
                     .setPositiveButton("Yes", ((dialogInterface, i) -> {
@@ -312,9 +331,14 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 LatLng latLng = marker.getPosition();
                 marker.setPosition(latLng);
                 addRoute(latLng);
-                calculateDistance(latLng);
+                try {
+                    calculateDistance(latLng);
+                } catch (JSONException e) {
+                    e.printStackTrace();
+                }
             }
         });
+        startLocationUpdates();
     }
 
     @Override
@@ -326,7 +350,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .draggable(true)
                 .icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED)));
         addRoute(latLng);
-        calculateDistance(latLng);
+        try {
+            calculateDistance(latLng);
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
     }
 
     @SuppressLint("MissingPermission")
@@ -345,22 +373,30 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void calculateDistance(LatLng latLng) {
+    public void calculateDistance(LatLng latLng) throws JSONException {
         float[] results = new float[3];
         Location.distanceBetween(currentLocation.latitude,currentLocation.longitude,latLng.latitude,latLng.longitude,results);
-        System.out.println(results[0] + "in meters");
-        float distance = (float) (Math.round(results[0]) * 1.09);
-        int dis = ((int) distance);
-        System.out.println(dis + " yrds now");
+        float distanceYds = (float) (Math.round(results[0]) * 1.09);
+        int dis = ((int) distanceYds);
+        distance = String.valueOf(dis);
         distanceText.setText(dis + " yds");
-        getRecommendation(dis);
+        getRecommendation();
     }
 
-    public void getRecommendation(int dis) {
-        TextView recommendation = findViewById(R.id.recommendationText);
-        clubRecommendation = map.get("7I");
-        distance = String.valueOf(dis);
+    public void getRecommendation() throws JSONException {
+        PayloadGenerator payloadGenerator = new PayloadGenerator();
+        JsonObjectRequest jsonObjectRequest = payloadGenerator.createJSONPayload(distance);
+        RecommendationAPI.getInstance(this).addToRequestQueue(jsonObjectRequest);
+        updateRecommendation();
+    }
 
+    public void updateRecommendation() {
+        Handler handler= new Handler();
+        handler.postDelayed(() -> {
+            TextView recommendation = findViewById(R.id.recommendationText);
+            clubRecommendation = GlobalVariables.getInstance().getRecommendation();
+            recommendation.setText(clubRecommendation);
+        }, 1000);
     }
 
     @Override
@@ -383,12 +419,41 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == GPS_REQUEST_CODE) {
             LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-            Boolean providerEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
+            boolean providerEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
             if (providerEnabled) {
                 Toast.makeText(this, "GPS is Enabled", Toast.LENGTH_SHORT).show();
             } else {
                 Toast.makeText(this, "GPS is not enabled", Toast.LENGTH_SHORT).show();
             }
         }
+    }
+
+    @SuppressLint("MissingPermission")
+    protected void startLocationUpdates() {
+
+        // Create the location request to start receiving updates
+        mLocationRequest = new LocationRequest();
+        mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+        /* 10 secs */
+        long UPDATE_INTERVAL = 10 * 1000;
+        mLocationRequest.setInterval(UPDATE_INTERVAL);
+        /* 2 sec */
+        long FASTEST_INTERVAL = 2000;
+        mLocationRequest.setFastestInterval(FASTEST_INTERVAL);
+
+        // Create LocationSettingsRequest object using location request
+        LocationSettingsRequest.Builder builder = new LocationSettingsRequest.Builder();
+        builder.addLocationRequest(mLocationRequest);
+        LocationSettingsRequest locationSettingsRequest = builder.build();
+
+        // new Google API SDK v11 uses getFusedLocationProviderClient(this)
+        getFusedLocationProviderClient(this).requestLocationUpdates(mLocationRequest, new LocationCallback() {
+
+                    @Override
+                    public void onLocationResult(LocationResult locationResult) {
+                        currentLocation = new LatLng(locationResult.getLastLocation().getLatitude(), locationResult.getLastLocation().getLongitude());
+                    }
+                },
+                Looper.myLooper());
     }
 }

@@ -103,7 +103,7 @@
         android:layout_height="0dp"
         android:layout_marginTop="31dp"
         android:background="@drawable/rounded_button"
-        android:text="@string/next_shot"
+        android:text="@string/start_shot"
         android:textAllCaps="false"
         android:textColor="#FFFFFF"
         app:layout_constraintEnd_toEndOf="parent"
@@ -153,7 +153,7 @@
             android:elevation="16dp"
             android:textSize="20sp"
             android:fontFamily="@font/roboto_mono"
-            android:text="7I"
+            android:text="-"
             android:textColor="@android:color/white"
             android:textStyle="bold" />
 

@@ -4,6 +4,8 @@
     <option name="filePathToZoomLevelMap">
       <map>
         <entry key="..\:/Users/kk_17/.gradle/caches/transforms-3/dd664a08e5221d6e38c6a5b608541051/transformed/material-1.3.0/res/drawable/design_fab_background.xml" value="0.13848684210526316" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/debug/res/layout/activity_end_screen.xml" value="0.22697368421052633" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/drawable/background_overlay.xml" value="0.13914473684210527" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/drawable/custom_button.xml" value="0.3796875" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/drawable/ic_baseline_arrow_back_24.xml" value="0.21927083333333333" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/drawable/ic_baseline_history_24.xml" value="0.3796875" />
@@ -21,7 +23,9 @@
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/font/roboto_mono.xml" value="0.14736842105263157" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout-w1240dp/activity_login2.xml" value="0.23360107095046853" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout-w936dp/activity_login2.xml" value="0.27265625" />
-        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_forgot_password.xml" value="0.5" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_end_screen.xml" value="0.12664473684210525" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_forgot_password.xml" value="0.22" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_hole_results.xml" value="0.22697368421052633" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_home.xml" value="0.36354166666666665" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_login.xml" value="0.36354166666666665" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_login2.xml" value="0.36354166666666665" />
@@ -29,6 +33,8 @@
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_maps.xml" value="0.33" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_new_round.xml" value="0.33" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_register.xml" value="0.36354166666666665" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_round_results.xml" value="0.2" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_search_result.xml" value="0.22730263157894737" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/activity_splash_screen.xml" value="0.36354166666666665" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/add_location_popup.xml" value="0.33" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/app_bar_home.xml" value="0.203125" />
@@ -37,7 +43,7 @@
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/content_home.xml" value="0.203125" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/content_main.xml" value="0.36354166666666665" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_gallery.xml" value="0.36354166666666665" />
-        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_history.xml" value="0.33" />
+        <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_history.xml" value="0.264" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_home.xml" value="0.36354166666666665" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_settings.xml" value="0.22730263157894737" />
         <entry key="..\:/Users/kk_17/AndroidStudioProjects/GolfApp/app/src/main/res/layout/fragment_slideshow.xml" value="0.36354166666666665" />

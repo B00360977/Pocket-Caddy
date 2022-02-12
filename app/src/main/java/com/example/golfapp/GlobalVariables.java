@@ -2,7 +2,7 @@ package com.example.golfapp;
 
 public class GlobalVariables {
 
-    private String userName, userEmail, uid, clubLocation;
+    private String userName, userEmail, uid, clubLocation, recommendation;
 
     private static final GlobalVariables instance = new GlobalVariables();
     public static GlobalVariables getInstance() {
@@ -25,6 +25,10 @@ public class GlobalVariables {
         return clubLocation;
     }
 
+    public String getRecommendation() {
+        return recommendation;
+    };
+
     public void setUserName(String string) {
         this.userName = string;
     }
@@ -39,6 +43,10 @@ public class GlobalVariables {
 
     public void setClubLocation(String string) {
         this.clubLocation = string;
+    }
+
+    public void setRecommendation(String string) {
+        this.recommendation = string;
     }
 }
 
