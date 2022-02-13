@@ -237,7 +237,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
     public boolean onCreateOptionsMenu(Menu menu) {
         // Inflate the menu; this adds items to the action bar if it is present.
         getMenuInflater().inflate(R.menu.quit, menu);
-        return true;
+        return super.onCreateOptionsMenu(menu);
     }
 
     @Override
@@ -245,7 +245,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         if (item.getItemId() == R.id.quitBtn) {
             new AlertDialog.Builder(this)
                     .setTitle("Confirm Quit")
-                    .setMessage("Your progress will be lost")
+                    .setMessage("Your progress so far will be saved")
                     .setPositiveButton("Yes", ((dialogInterface, i) -> startActivity(new Intent(getApplicationContext(), HomeActivity.class))))
                     .setNegativeButton("No", ((dialogInterface, i) -> dialogInterface.cancel()))
                     .setCancelable(true)
