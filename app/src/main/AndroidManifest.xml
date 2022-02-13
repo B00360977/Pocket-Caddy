@@ -20,6 +20,18 @@
         android:theme="@style/Theme.GolfApp"
         android:usesCleartextTraffic="true">
         <activity
+            android:name=".PasswordChangeActivity"
+            android:label="Update Password"
+            android:exported="false" />
+        <activity
+            android:name=".EmailChangeActivity"
+            android:label="Update Email Address"
+            android:exported="false" />
+        <activity
+            android:name=".AccountNameChangeActivity"
+            android:label="Update Account Name"
+            android:exported="false" />
+        <activity
             android:name=".HoleResultsActivity"
             android:exported="false" />
         <activity

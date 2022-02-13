@@ -13,6 +13,5 @@ public class EndScreen extends AppCompatActivity {
         setContentView(R.layout.activity_end_screen);
         Button homeBtn = findViewById(R.id.homeButton);
         homeBtn.setOnClickListener(view -> startActivity(new Intent(getApplicationContext(), HomeActivity.class)));
-
     }
 }

@@ -78,6 +78,13 @@ public class HomeActivity extends AppCompatActivity {
 
     }
 
+    public void updateTitle(String userName) {
+        NavigationView navigationView = binding.navView;
+        View header = navigationView.getHeaderView(0);
+        TextView navTitle = header.findViewById(R.id.nav_title);
+        navTitle.setText(userName);
+    }
+
     @Override
     public void onBackPressed() {
         Intent intent = new Intent(Intent.ACTION_MAIN);

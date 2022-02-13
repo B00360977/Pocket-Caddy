@@ -8,6 +8,7 @@ import androidx.core.content.res.ResourcesCompat;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
@@ -47,23 +48,29 @@ public class ForgotPassword extends AppCompatActivity {
             @Override
             public void onClick(View v) {
 
-                // Show the spinning progress bar to show that the app is processing
-                progressBar.setVisibility(View.VISIBLE);
+                String email = mEmail.getText().toString().trim();
+                if (TextUtils.isEmpty(email)) {
+                    mEmail.setError("Email cannot be empty");
+                } else {
 
-                // Gets email and sends reset link
-                fAuth.sendPasswordResetEmail(mEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
-                    @Override
-                    public void onComplete(@NonNull Task<Void> task) {
-                        if(task.isSuccessful()) {
-                            Toast.makeText(ForgotPassword.this, "Please check you email for password reset link", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(ForgotPassword.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                    // Show the spinning progress bar to show that the app is processing
+                    progressBar.setVisibility(View.VISIBLE);
+
+                    // Gets email and sends reset link
+                    fAuth.sendPasswordResetEmail(mEmail.getText().toString()).addOnCompleteListener(new OnCompleteListener<Void>() {
+                        @Override
+                        public void onComplete(@NonNull Task<Void> task) {
+                            if (task.isSuccessful()) {
+                                Toast.makeText(ForgotPassword.this, "Please check you email for password reset link", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(ForgotPassword.this, task.getException().getMessage(), Toast.LENGTH_SHORT).show();
+                            }
+                            progressBar.setVisibility(View.GONE);
                         }
-                        progressBar.setVisibility(View.GONE);
-                    }
-                });
-                // Moves user back to Login Screen
-                startActivity(new Intent(getApplicationContext(), Login.class));
+                    });
+                    // Moves user back to Login Screen
+                    startActivity(new Intent(getApplicationContext(), Login.class));
+                }
             }
         });
     }
