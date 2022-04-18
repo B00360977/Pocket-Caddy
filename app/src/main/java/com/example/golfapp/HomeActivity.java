@@ -29,8 +29,6 @@ import java.util.Objects;
 public class HomeActivity extends AppCompatActivity {
 
     private AppBarConfiguration mAppBarConfiguration;
-    private ActivityHomeBinding binding;
-    public String userName, userEmail, uid;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,16 +36,16 @@ public class HomeActivity extends AppCompatActivity {
 
         FirebaseUser fAuthUser = FirebaseAuth.getInstance().getCurrentUser();
         assert fAuthUser != null;
-        userName = fAuthUser.getDisplayName();
-        userEmail = fAuthUser.getEmail();
-        uid = fAuthUser.getUid();
+        String userName = fAuthUser.getDisplayName();
+        String userEmail = fAuthUser.getEmail();
+        String uid = fAuthUser.getUid();
 
         GlobalVariables globalVariables = GlobalVariables.getInstance();
         globalVariables.setUserName(userName);
         globalVariables.setUserEmail(userEmail);
         globalVariables.setUid(uid);
 
-        binding = ActivityHomeBinding.inflate(getLayoutInflater());
+        com.example.golfapp.databinding.ActivityHomeBinding binding = ActivityHomeBinding.inflate(getLayoutInflater());
         setContentView(binding.getRoot());
 
         setSupportActionBar(binding.appBarHome.toolbar);

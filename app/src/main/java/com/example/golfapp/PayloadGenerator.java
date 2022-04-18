@@ -1,18 +1,24 @@
 package com.example.golfapp;
 
+import android.util.Log;
 import com.android.volley.Request;
 import com.android.volley.Response;
 import com.android.volley.VolleyError;
 import com.android.volley.toolbox.JsonObjectRequest;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+/**
+ * This class is used to create a JSON payload that can be sent to the machine learning
+ * algorithm to get a recommendation
+ */
+
 public class PayloadGenerator {
 
-    private String url = "http://86cd8507-d97a-4c5b-a1c0-baf1f2f6d789.westeurope.azurecontainer.io/score";
+    private String url = "http://c2b3da2d-3bca-4cd1-b562-58ab936f551a.westeurope.azurecontainer.io/score";
 
+    // create the json object that can be sent
     public JsonObjectRequest createJSONPayload(String distance) throws JSONException {
 
         JSONObject firstObject = new JSONObject();
@@ -38,12 +44,11 @@ public class PayloadGenerator {
                     e.printStackTrace();
                 }
                 GlobalVariables.getInstance().setRecommendation(responseText);
-                System.out.println(responseText);
             }
         }, new Response.ErrorListener() {
             @Override
             public void onErrorResponse(VolleyError error) {
-                //handles error in response
+                Log.e("Error", error.getMessage());
             }
         });
         return jsonObjectRequest;

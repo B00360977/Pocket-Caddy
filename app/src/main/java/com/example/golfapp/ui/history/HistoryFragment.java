@@ -32,10 +32,7 @@ import java.util.Date;
 public class HistoryFragment extends Fragment {
 
     private FragmentHistoryBinding binding;
-    private DatePickerDialog startDatePickerDialog;
     private TextView startDate, endDate;
-    private ConstraintLayout startCalendar, endCalendar;
-    private Button searchBtn;
     private Date endDateFormat, startDateFormat;
     private int msDate, msMonth, msYear, meDate, meMonth, meYear;
 
@@ -44,11 +41,11 @@ public class HistoryFragment extends Fragment {
 
         binding = FragmentHistoryBinding.inflate(inflater, container, false);
         View root = binding.getRoot();
-        searchBtn = binding.searchButton;
+        Button searchBtn = binding.searchButton;
         startDate = binding.startDate;
-        startCalendar = binding.constraintLayout1;
+        ConstraintLayout startCalendar = binding.constraintLayout1;
         endDate = binding.endDate;
-        endCalendar = binding.constraintLayout2;
+        ConstraintLayout endCalendar = binding.constraintLayout2;
 
         startCalendar.setOnClickListener(new View.OnClickListener() {
             @Override

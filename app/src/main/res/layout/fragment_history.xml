@@ -8,6 +8,39 @@
     android:background="@drawable/app_background"
     tools:context=".ui.history.HistoryFragment">
 
+    <ImageView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:src="@drawable/background_overlay"/>
+
+    <TextView
+        android:id="@+id/startDateTxt"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="@string/start_date"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout1"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.413"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0" />
+
+    <TextView
+        android:id="@+id/endDateTxt"
+        android:layout_width="150dp"
+        android:layout_height="wrap_content"
+        android:text="@string/end_date"
+        android:textColor="@color/black"
+        android:textSize="20sp"
+        app:layout_constraintBottom_toTopOf="@+id/constraintLayout2"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.413"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/constraintLayout1"
+        app:layout_constraintVertical_bias="1.0" />
+
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/constraintLayout1"
         android:layout_width="wrap_content"
@@ -17,15 +50,15 @@
         app:layout_constraintHorizontal_bias="0.495"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.894">
+        app:layout_constraintVertical_bias="0.82">
 
         <TextView
             android:id="@+id/startDate"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="@string/start_date"
-            android:textSize="20sp"
+            android:hint="yyyy/mm/dd"
             android:textColor="@color/black"
+            android:textSize="20sp"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
@@ -47,7 +80,7 @@
         android:id="@+id/constraintLayout2"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="108dp"
+        android:layout_marginBottom="100dp"
         app:layout_constraintBottom_toTopOf="@+id/searchButton"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.495"
@@ -57,7 +90,7 @@
             android:id="@+id/endDate"
             android:layout_width="150dp"
             android:layout_height="wrap_content"
-            android:hint="@string/end_date"
+            android:hint="yyyy/mm/dd"
             android:textSize="20sp"
             android:textColor="@color/black"
             app:layout_constraintBottom_toBottomOf="parent"

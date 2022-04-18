@@ -2,26 +2,31 @@ package com.example.golfapp;
 
 import android.os.StrictMode;
 import android.util.Log;
-
 import java.sql.Connection;
 import java.sql.DriverManager;
 
-public class DatabaseConnector {
+/**
+ * This class is used to generate a connection to the cloud based database
+ * This is used in a number of classes to run SQL queries on the database
+ * for inserting new records and searching the user previous history
+ */
 
-    String uname, pass, ip, port, database;
+public class DatabaseConnector {
 
     public Connection connectionClass() {
 
-        ip = "pocket-caddy.database.windows.net";
-        database = "pocket-caddy-db";
-        pass = "Aardvark1";
-        uname = "pocketCaddyAdmin";
-        port = "1433";
+        //key parameters for connecting to the database
+        String ip = "pocket-caddy.database.windows.net";
+        String database = "pocket-caddy-db";
+
+        //secret keys which are hidden to users and stored securely within the app
+        String pass = BuildConfig.DATABASE_PASSWORD;
+        String uname = BuildConfig.DATABASE_USERNAME;
 
         StrictMode.ThreadPolicy policy = new StrictMode.ThreadPolicy.Builder().permitAll().build();
         StrictMode.setThreadPolicy(policy);
         Connection connection = null;
-        String connectionURL = null;
+        String connectionURL;
 
         try {
             Class.forName("net.sourceforge.jtds.jdbc.Driver");

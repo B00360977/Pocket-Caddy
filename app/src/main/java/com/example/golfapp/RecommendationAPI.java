@@ -5,6 +5,11 @@ import com.android.volley.Request;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.Volley;
 
+/**
+ * This class handles the multi threading of the recommendation request so that users can continue
+ * to use the app while waiting on the response
+ */
+
 public class RecommendationAPI {
 
     private static RecommendationAPI instance;

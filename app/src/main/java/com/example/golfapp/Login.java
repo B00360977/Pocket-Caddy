@@ -2,7 +2,6 @@ package com.example.golfapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,33 +11,38 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * This is the class used to authenticate users when logging in
+ *
+ */
+
 public class Login extends AppCompatActivity {
 
-    EditText mEmail, mPassword;
-    Button mLoginBtn;
-    TextView mCreateBtn, mForgotPassBtn;
-    ProgressBar progressBar;
-    FirebaseAuth fAuth;
+    private EditText mEmail, mPassword;
+    private ProgressBar progressBar;
+    private FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set screen content
         setContentView(R.layout.activity_login);
 
         mEmail = findViewById(R.id.email);
         mPassword = findViewById(R.id.password);
         progressBar = findViewById(R.id.progressBar2);
         fAuth = FirebaseAuth.getInstance();
-        mLoginBtn = findViewById(R.id.loginButton);
-        mCreateBtn = findViewById(R.id.textView4);
-        mForgotPassBtn = findViewById(R.id.forgotPassword);
+        Button mLoginBtn = findViewById(R.id.loginButton);
+        TextView mCreateBtn = findViewById(R.id.textView4);
+        TextView mForgotPassBtn = findViewById(R.id.forgotPassword);
 
+        // add listener to login button
         mLoginBtn.setOnClickListener(new View.OnClickListener(){
 
             @Override

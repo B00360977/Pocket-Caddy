@@ -69,6 +69,19 @@
     <string name="green_check_mark">Green Check Mark</string>
     <string name="finish_round">Finish Round</string>
     <string name="finish_shot">"Finish Shot "</string>
+    <string name="update_account_name">Update Account Name</string>
+    <string name="update_email">Update Email</string>
+    <string name="update_password">Update Password</string>
+    <string name="account_name">Account Name</string>
+    <string name="submit">Submit</string>
+    <string name="current_account_name">Current Account Name</string>
+    <string name="new_account_name">New Account Name</string>
+    <string name="background_overlay">background overlay</string>
+    <string name="new_email_address">New Email Address</string>
+    <string name="current_email_address">Current Email Address</string>
+    <string name="new_password">New Password</string>
+    <string name="current_password">Current Password</string>
+    <string name="confirm_new_password">Confirm New Password</string>
 
 
 </resources>
