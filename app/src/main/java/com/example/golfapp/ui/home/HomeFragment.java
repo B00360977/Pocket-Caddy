@@ -24,7 +24,6 @@ import java.util.Objects;
 public class HomeFragment extends Fragment implements View.OnClickListener{
 
     private FragmentHomeBinding binding;
-    Button newRoundBtn, viewHistoryBtn;
 
     public View onCreateView(@NonNull LayoutInflater inflater,
                              ViewGroup container, Bundle savedInstanceState) {
@@ -35,10 +34,10 @@ public class HomeFragment extends Fragment implements View.OnClickListener{
         final TextView textView = binding.accountName;
         textView.setText(GlobalVariables.getInstance().getUserName());
 
-        viewHistoryBtn = binding.historyButton;
+        Button viewHistoryBtn = binding.historyButton;
         viewHistoryBtn.setOnClickListener(this);
 
-        newRoundBtn = binding.newRoundButton;
+        Button newRoundBtn = binding.newRoundButton;
         newRoundBtn.setOnClickListener(this);
 
         return root;

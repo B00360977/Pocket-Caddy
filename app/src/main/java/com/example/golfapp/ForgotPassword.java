@@ -4,46 +4,48 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.Toolbar;
-import androidx.core.content.res.ResourcesCompat;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.FirebaseAuth;
 
+/**
+ * The ForgotPassword class handles the Firebase reset password methods
+ */
+
 public class ForgotPassword extends AppCompatActivity {
 
-    EditText mEmail;
-    Button mResetBtn;
-    ProgressBar progressBar;
-    FirebaseAuth fAuth;
-    ImageButton mBackBtn;
+    private EditText mEmail;
+    private ProgressBar progressBar;
+    private FirebaseAuth fAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set the content for the screen
         setContentView(R.layout.activity_forgot_password);
 
         mEmail = findViewById(R.id.email);
         progressBar = findViewById(R.id.progressBar2);
         fAuth = FirebaseAuth.getInstance();
-        mResetBtn = findViewById(R.id.resetButton);
+        Button mResetBtn = findViewById(R.id.resetButton);
 
+        // adding the toolbar
         androidx.appcompat.widget.Toolbar myToolbar = (Toolbar) findViewById(R.id.toolbar2);
         setSupportActionBar(myToolbar);
         ActionBar actionBar = getSupportActionBar();
         assert actionBar != null;
         actionBar.setDisplayHomeAsUpEnabled(true);
 
+        // add listener to submit button
         mResetBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

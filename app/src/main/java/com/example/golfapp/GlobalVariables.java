@@ -1,8 +1,13 @@
 package com.example.golfapp;
 
+/**
+ * This is a singleton class that the app uses to store regularly used variables
+ */
+
 public class GlobalVariables {
 
     private String userName, userEmail, uid, clubLocation, recommendation;
+    private int roundID;
 
     private static final GlobalVariables instance = new GlobalVariables();
     public static GlobalVariables getInstance() {
@@ -29,6 +34,10 @@ public class GlobalVariables {
         return recommendation;
     };
 
+    public int getRoundID() {
+      return roundID;
+    };
+
     public void setUserName(String string) {
         this.userName = string;
     }
@@ -48,5 +57,9 @@ public class GlobalVariables {
     public void setRecommendation(String string) {
         this.recommendation = string;
     }
+
+    public void setRoundID(int round) {
+      this.roundID = round;
+    };
 }
 

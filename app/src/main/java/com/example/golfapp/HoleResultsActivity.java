@@ -1,8 +1,6 @@
 package com.example.golfapp;
 
 import androidx.appcompat.app.AppCompatActivity;
-
-import android.content.Intent;
 import android.graphics.Color;
 import android.graphics.Typeface;
 import android.os.Bundle;
@@ -14,21 +12,27 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
+/**
+ * This class is used to search and display results for each Hole
+ * This class links closely to RoundResultsActivity & SearchResultsActivity
+ */
+
 public class HoleResultsActivity extends AppCompatActivity {
 
-    private String roundID, courseName, roundDate, holeNumber;
+    private String roundID;
+    private String holeNumber;
     private TableLayout tableLayout;
-    Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        // set content for the screen
         setContentView(R.layout.activity_hole_results);
 
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -37,13 +41,15 @@ public class HoleResultsActivity extends AppCompatActivity {
         TextView tableTitle = findViewById(R.id.tableTitleHole);
         TextView tableCourseName = findViewById(R.id.tableCourseName);
 
+        // retrieve variables fro last activity that have been passed
         Bundle extras = getIntent().getExtras();
         tableLayout = findViewById(R.id.tableMainHole);
 
         if (extras != null) {
+            // getting variables from bundle
             roundID = extras.getString("roundID");
-            courseName = extras.getString("courseName");
-            roundDate = extras.getString("roundDate");
+            String courseName = extras.getString("courseName");
+            String roundDate = extras.getString("roundDate");
             holeNumber = extras.getString("holeNumber");
 
             tableTitle.setText("Details for Hole No. " + holeNumber);
@@ -68,19 +74,23 @@ public class HoleResultsActivity extends AppCompatActivity {
         finish();
     }
 
-    public ResultSet getHoleDetails(String roundDetails) {
+    // retrieves results from the database
+    private ResultSet getHoleDetails(String roundDetails) {
 
         ResultSet resultSet = null;
         try {
+            // creating a new database connection
             DatabaseConnector databaseConnector = new DatabaseConnector();
-            connection = databaseConnector.connectionClass();
+            Connection connection = databaseConnector.connectionClass();
             if (connection != null) {
+                // building the SQL query
                 String query = "SELECT dbo.[tbl.Shots].shotNumber, dbo.[tbl.Golf_Clubs].clubName, dbo.[tbl.Shots].distance\n" +
                     "FROM dbo.[tbl.Shots] INNER JOIN\n" +
                     "dbo.[tbl.Hole] ON dbo.[tbl.Shots].holeID = dbo.[tbl.Hole].holeID INNER JOIN\n" +
                     "dbo.[tbl.Golf_Clubs] ON dbo.[tbl.Shots].clubID = dbo.[tbl.Golf_Clubs].clubID\n" +
                     "WHERE (dbo.[tbl.Hole].roundID = " + roundID + ") AND (dbo.[tbl.Hole].holeNumber = " + holeNumber + ")";
 
+                // execute statement and get response
                 Statement statement = connection.createStatement();
                 resultSet =  statement.executeQuery(query);
             } else {
@@ -92,7 +102,8 @@ public class HoleResultsActivity extends AppCompatActivity {
         return resultSet;
     }
 
-    public void populateTableData(ResultSet data) {
+    // updates the screen with the data received from the database
+    private void populateTableData(ResultSet data) {
 
         while (true) {
             try {

@@ -17,12 +17,16 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.util.Objects;
 
+/**
+ * This class handles all user requests to update their account password
+ */
+
 public class PasswordChangeActivity extends AppCompatActivity {
 
-    EditText currentPasswordField, newPasswordField, confirmNewPasswordField;
-    String currentPassword, newPassword, confirmNewPassword, userEmail;
-    FirebaseUser firebaseUser;
-    ProgressBar progressBar;
+    private EditText currentPasswordField, newPasswordField, confirmNewPasswordField;
+    private String currentPassword, newPassword, confirmNewPassword, userEmail;
+    private FirebaseUser firebaseUser;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -63,7 +67,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public boolean validatePasswords() {
+    // checks that the passwords given match
+    private boolean validatePasswords() {
 
         if(TextUtils.isEmpty(currentPassword)){
             currentPasswordField.setError("You must provide your current password");
@@ -84,7 +89,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
         return true;
     }
 
-    public void reauthenticateUser() {
+    // users have to be reauthenticated before changing password
+    private void reauthenticateUser() {
         AuthCredential credential = EmailAuthProvider.getCredential(userEmail, currentPassword);
         firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -96,7 +102,8 @@ public class PasswordChangeActivity extends AppCompatActivity {
         });
     }
 
-    public void updatePassword() {
+    // sends change request to Firebase to update the users password and logs the user out
+    private void updatePassword() {
         firebaseUser.updatePassword(newPassword)
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

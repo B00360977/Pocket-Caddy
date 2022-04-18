@@ -19,6 +19,14 @@ import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import java.util.Objects;
 
+/**
+ * EmailChangeActivity class handles the users request to update the email associated
+ * with their account in Firebase.
+ * Any email change always requires the user to verify the email so once the request
+ * is submitted the user is logged out and asked to verify the new email by clicking
+ * the link in the email they have been sent.
+ */
+
 public class EmailChangeActivity extends AppCompatActivity {
 
     private EditText newEmailText;
@@ -29,18 +37,23 @@ public class EmailChangeActivity extends AppCompatActivity {
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+
+        //set content for the screen to display
         setContentView(R.layout.activity_email_change);
         Objects.requireNonNull(getSupportActionBar()).setDisplayHomeAsUpEnabled(true);
         getSupportActionBar().setDisplayShowHomeEnabled(true);
 
+        //get the current users account from Firebase
         firebaseUser = FirebaseAuth.getInstance().getCurrentUser();
         progressBar = findViewById(R.id.progressBar4);
         EditText currentEmailText = findViewById(R.id.currentEmailAddress);
         currentEmail = firebaseUser.getEmail();
         currentEmailText.setText(currentEmail);
         newEmailText = findViewById(R.id.newEmailAddress);
-
         Button submitBtn = findViewById(R.id.submitBtn);
+
+        //adding a listener to the submit button that will send the change request and ensure
+        //an email has been provided
         submitBtn.setOnClickListener(view -> {
             newEmailText = findViewById(R.id.newEmailAddress);
             newEmailAddress = newEmailText.getText().toString().trim();
@@ -52,6 +65,7 @@ public class EmailChangeActivity extends AppCompatActivity {
         });
     }
 
+    //adds home button functionality to toolbar
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         if (item.getItemId() == android.R.id.home) {
@@ -60,12 +74,14 @@ public class EmailChangeActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void updateEmail() {
+    private void updateEmail() {
         progressBar.setVisibility(View.VISIBLE);
         reauthenticateUser();
     }
 
-    public void reauthenticateUser() {
+    //if the user has been logged in for a while they need to be reauthenticated before being able
+    //to change their email
+    private void reauthenticateUser() {
         AuthCredential credential = EmailAuthProvider.getCredential(currentEmail, userPassword);
         firebaseUser.reauthenticate(credential).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
@@ -76,7 +92,7 @@ public class EmailChangeActivity extends AppCompatActivity {
         });
     }
 
-    public void getPassword() {
+    private void getPassword() {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Enter Password");
 
@@ -92,7 +108,8 @@ public class EmailChangeActivity extends AppCompatActivity {
         builder.show();
     }
 
-    public void updateFirebase() {
+    //this function will send the change request to Firebase
+    private void updateFirebase() {
         firebaseUser.updateEmail(newEmailAddress).addOnCompleteListener(task -> {
             if (task.isSuccessful()) {
                 GlobalVariables.getInstance().setUserEmail(newEmailAddress);
@@ -108,7 +125,9 @@ public class EmailChangeActivity extends AppCompatActivity {
         });
     }
 
-    public void sendVerificationEmail() {
+    //Once an email change is completed a verification email needs to be sent but calling
+    //this function
+    private void sendVerificationEmail() {
         firebaseUser.sendEmailVerification()
                 .addOnCompleteListener(task -> {
                     if (task.isSuccessful()) {

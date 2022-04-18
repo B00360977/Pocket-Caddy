@@ -29,7 +29,6 @@ public class SearchResultActivity extends AppCompatActivity {
 
     private String startDate, endDate;
     private TableLayout tableLayout;
-    Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -133,7 +132,7 @@ public class SearchResultActivity extends AppCompatActivity {
         return super.onOptionsItemSelected(item);
     }
 
-    public void noSearchResult() {
+    private void noSearchResult() {
 
         new AlertDialog.Builder(this)
                 .setTitle("No Results Found")
@@ -148,12 +147,12 @@ public class SearchResultActivity extends AppCompatActivity {
                 .show();
     }
 
-    public ResultSet getSearchResults(String startDate, String endDate) {
+    private ResultSet getSearchResults(String startDate, String endDate) {
 
         ResultSet resultSet = null;
         try {
             DatabaseConnector databaseConnector = new DatabaseConnector();
-            connection = databaseConnector.connectionClass();
+            Connection connection = databaseConnector.connectionClass();
             if (connection != null) {
                 String query = "SELECT   dbo.[tbl.Round].dateOfMatch, dbo.[tbl.Courses].courseName, dbo.[tbl.Round].roundID\n" +
                 "FROM dbo.[tbl.Round] INNER JOIN\n" +
@@ -172,7 +171,7 @@ public class SearchResultActivity extends AppCompatActivity {
         return resultSet;
     }
 
-    public void createBaseTable() {
+    private void createBaseTable() {
         TableRow tableRow0 = new TableRow(this);
         TextView textView0 = new TextView(this);
         textView0.setText("Date");

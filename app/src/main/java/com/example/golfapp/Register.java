@@ -2,7 +2,6 @@ package com.example.golfapp;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.TextUtils;
@@ -12,20 +11,21 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.UserProfileChangeRequest;
 
+/**
+ * This class handles the registration process for all new users
+ */
+
 public class Register extends AppCompatActivity {
 
-    EditText mFullName, mEmail, mPassword;
-    Button mRegisterBtn;
-    TextView mLoginBtn;
-    FirebaseAuth fAuth;
-    ProgressBar progressBar;
+    private EditText mFullName, mEmail, mPassword;
+    private FirebaseAuth fAuth;
+    private ProgressBar progressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -35,8 +35,8 @@ public class Register extends AppCompatActivity {
         mFullName = findViewById(R.id.fullName);
         mEmail = findViewById(R.id.email);
         mPassword = findViewById(R.id.password);
-        mRegisterBtn = findViewById(R.id.registerButton);
-        mLoginBtn = findViewById(R.id.createText);
+        Button mRegisterBtn = findViewById(R.id.registerButton);
+        TextView mLoginBtn = findViewById(R.id.createText);
 
         fAuth = FirebaseAuth.getInstance();
         progressBar = findViewById(R.id.progressBar);

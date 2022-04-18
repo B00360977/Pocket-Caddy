@@ -9,18 +9,16 @@ import androidx.core.content.ContextCompat;
 import androidx.fragment.app.FragmentActivity;
 import android.Manifest;
 import android.annotation.SuppressLint;
-import android.app.Activity;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
 import android.provider.Settings;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ArrayAdapter;
@@ -47,38 +45,46 @@ import com.example.golfapp.databinding.ActivityMapsBinding;
 import com.google.android.gms.maps.model.Polyline;
 import com.google.android.gms.maps.model.PolylineOptions;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
-import com.karumi.dexter.Dexter;
-import com.karumi.dexter.PermissionToken;
-import com.karumi.dexter.listener.PermissionDeniedResponse;
-import com.karumi.dexter.listener.PermissionGrantedResponse;
-import com.karumi.dexter.listener.PermissionRequest;
-import com.karumi.dexter.listener.single.PermissionListener;
 import org.json.JSONException;
+import java.sql.Connection;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
+
+/**
+ * This is the main class of the application. In this class is where the shots are all recorded
+ * and where the recommendation is retrieved
+ */
 
 public class MapsActivity extends FragmentActivity implements OnMapReadyCallback, GoogleMap.OnMapLongClickListener, GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener {
 
     private GoogleMap mMap;
-    FloatingActionButton fab;
+    private FloatingActionButton fab;
     private FusedLocationProviderClient mLocationClient;
     private Boolean isPermissionGranted;
     private final int GPS_REQUEST_CODE = 9001;
     private LatLng currentLocation, startLocation, endLocation;
     private Polyline mPolyline;
     private TextView distanceText;
-    private int holeNumber = 1, shotNumber = 1;
+    private int holeNumber = 1;
+    private int shotNumber = 1;
+    private int roundID;
+    private String holeID;
     private String clubRecommendation = "", distance = "";
     private LocationRequest mLocationRequest;
-    Map<String, String> map;
-    Spinner clubChoiceDropDown;
-    Button nextHoleBtn, nextShotBtn;
+    private Map<String, String> map;
+    private Spinner clubChoiceDropDown;
+    private Button nextHoleBtn, nextShotBtn;
 
     @SuppressLint("MissingPermission")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         com.example.golfapp.databinding.ActivityMapsBinding binding = ActivityMapsBinding.inflate(getLayoutInflater());
+
+        // set screen content
         setContentView(binding.getRoot());
         setActionBar(binding.toolbar);
         getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot " + shotNumber);
@@ -87,6 +93,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
+
+        // loads the map
         initMap();
         mLocationClient = new FusedLocationProviderClient(this);
         mLocationClient.getLastLocation().addOnCompleteListener(task -> {
@@ -95,6 +103,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 location = task.getResult();
                 currentLocation = new LatLng(location.getLatitude(), location.getLongitude());
         }});
+        roundID = GlobalVariables.getInstance().getRoundID();
         distanceText = findViewById(R.id.yrdsText);
         clubChoiceDropDown = findViewById(R.id.spinner);
         ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this, R.array.golf_clubs_array, android.R.layout.simple_spinner_item);
@@ -146,6 +155,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         map.put("LW", "Lob Wedge");
         map.put("P", "Putter");
 
+        // adds first hole to round
+        insertHole();
     }
 
     @Override
@@ -159,7 +170,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                 .show();
     }
 
-    public void startShot() {
+    // get the users current location and sets as the start location
+    private void startShot() {
         if (!clubChoiceDropDown.getSelectedItem().toString().equals("Select Club")) {
             startLocation = currentLocation;
             nextShotBtn.setText("Finish Shot " + shotNumber);
@@ -169,9 +181,12 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void finishShot() {
+    // records the users final location calculates the distance and add to the database
+    private void finishShot() {
         if (!clubChoiceDropDown.getSelectedItem().toString().equals("Select Club")) {
             endLocation = currentLocation;
+            String clubID = getClubID(map, clubChoiceDropDown.getSelectedItem().toString());
+            insertShot(clubID);
             shotNumber = shotNumber + 1;
             Toast.makeText(this, "Shot " + shotNumber + " coming up", Toast.LENGTH_SHORT).show();
             resetSpinner();
@@ -184,7 +199,19 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
-    public void nextHole() {
+    // get the club id (key) from the hash map given the value
+    private static <T, E> T getClubID(Map<T, E> map1, E value) {
+        for (Map.Entry<T, E> entry : map1.entrySet()) {
+            if (Objects.equals(value, entry.getValue())) {
+                return entry.getKey();
+            }
+        }
+        return null;
+    }
+
+    // updates hole counter and inserts a new hole record into database
+    private void nextHole() {
+        // checks if user is on the final hole and asks to confirm they are completed
         if (holeNumber == 18) {
             new AlertDialog.Builder(this)
                     .setTitle("Confirm Round Complete")
@@ -194,28 +221,33 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     .setCancelable(true)
                     .show();
         } else {
+            // updates text on button to finish round once completed hole 17
             if (holeNumber == 17) {
                 nextHoleBtn.setText(R.string.finish_round);
             }
             holeNumber = holeNumber + 1;
+            insertHole();
             shotNumber = 1;
             Toast.makeText(this, "On to the next hole", Toast.LENGTH_SHORT).show();
             resetSpinner();
             nextShotBtn.setText("Start Shot " + shotNumber);
+            // clears the map so the user starts fresh on the next hole
             mMap.clear();
             setTitle();
         }
     }
-
-    public void resetSpinner() {
+    // resets club dropdown to default position
+    private void resetSpinner() {
         clubChoiceDropDown.setSelection(0);
     }
 
-    public void setTitle() {
+    // updates the title shown on screen
+    private void setTitle() {
         getActionBar().setTitle("Pocket Caddy - Hole " + holeNumber + "  Shot "+ shotNumber);
     }
 
-    public void createRecommendationPopup() {
+    // creates the popup that displays the recommendation to the user
+    private void createRecommendationPopup() {
         if (!distance.equals("")) {
             new AlertDialog.Builder(this)
                     .setTitle("Golf Club Recommendation")
@@ -255,6 +287,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return super.onOptionsItemSelected(item);
     }
 
+    // initialises the map and checks if location permission has been enabled, if not is asks the user to enable location
     private void initMap() {
         if (isPermissionGranted) {
             if (isGPSEnabled()) {
@@ -267,6 +300,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // verifies GPS is enabled on the device
     private boolean isGPSEnabled() {
         LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
         boolean providerEnabled = locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER);
@@ -286,6 +320,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         return false;
     }
 
+    // checks that app has access to fine location and creates popup to get permission if not given
     private void checkMapPermission() throws InterruptedException {
 
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
@@ -308,41 +343,11 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         } else {
             isPermissionGranted = true;
         }
-
-        /*
-
-        Dexter.withContext(this).withPermission(Manifest.permission.ACCESS_FINE_LOCATION).withListener(new PermissionListener() {
-            @Override
-            public void onPermissionGranted(PermissionGrantedResponse permissionGrantedResponse) {
-                isPermissionGranted = true;
-                System.out.println("##################################################");
-                System.out.println(isPermissionGranted);
-            }
-
-            @Override
-            public void onPermissionDenied(PermissionDeniedResponse permissionDeniedResponse) {
-                System.out.println("~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~");
-                Intent intent = new Intent();
-                intent.setAction(Settings.ACTION_APPLICATION_DETAILS_SETTINGS);
-                Uri uri = Uri.fromParts("package", getPackageName(), "");
-                intent.setData(uri);
-                startActivity(intent);
-            }
-
-            @Override
-            public void onPermissionRationaleShouldBeShown(PermissionRequest permissionRequest, PermissionToken permissionToken) {
-                permissionToken.continuePermissionRequest();
-            }
-        }).check();
-
-         */
     }
 
     /**
      * Manipulates the map once available.
      * This callback is triggered when the map is ready to be used.
-     * This is where we can add markers or lines, add listeners or move the camera. In this case,
-     * we just add a marker near Sydney, Australia.
      * If Google Play services is not installed on the device, the user will be prompted to install
      * it inside the SupportMapFragment. This method will only be triggered once the user has
      * installed Google Play services and returned to the app.
@@ -380,6 +385,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         startLocationUpdates();
     }
 
+    // adds the location pin to the map and calculates the distance
     @Override
     public void onMapLongClick(LatLng latLng) {
         mMap.clear();
@@ -396,6 +402,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // adds the polyline from the users current location to the dropped pin
     @SuppressLint("MissingPermission")
     public void addRoute(LatLng latlng) {
         if (mPolyline != null) {
@@ -412,7 +419,8 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         });
     }
 
-    public void calculateDistance(LatLng latLng) throws JSONException {
+    // calculates the distance between users current location and a point
+    private void calculateDistance(LatLng latLng) throws JSONException {
         float[] results = new float[3];
         Location.distanceBetween(currentLocation.latitude,currentLocation.longitude,latLng.latitude,latLng.longitude,results);
         float distanceYds = (float) (Math.round(results[0]) * 1.09);
@@ -422,14 +430,16 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         getRecommendation();
     }
 
-    public void getRecommendation() throws JSONException {
+    // retrieves recommendation from the machine learning algorithm
+    private void getRecommendation() throws JSONException {
         PayloadGenerator payloadGenerator = new PayloadGenerator();
         JsonObjectRequest jsonObjectRequest = payloadGenerator.createJSONPayload(distance);
         RecommendationAPI.getInstance(this).addToRequestQueue(jsonObjectRequest);
         updateRecommendation();
     }
 
-    public void updateRecommendation() {
+    // updates the recommendation box with the latest recommendation
+    private void updateRecommendation() {
         Handler handler= new Handler();
         handler.postDelayed(() -> {
             TextView recommendation = findViewById(R.id.recommendationText);
@@ -467,6 +477,7 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
         }
     }
 
+    // starts to get the users current location in intervals to keep it up to date
     @SuppressLint("MissingPermission")
     protected void startLocationUpdates() {
 
@@ -494,5 +505,55 @@ public class MapsActivity extends FragmentActivity implements OnMapReadyCallback
                     }
                 },
                 Looper.myLooper());
+    }
+
+    // adds a new record to tbl.Hole in database
+    private void insertHole() {
+        try {
+            DatabaseConnector databaseConnector = new DatabaseConnector();
+            Connection connection = databaseConnector.connectionClass();
+            if (connection != null) {
+                String[] returnID = { "holeID" };
+                String query = "INSERT INTO dbo.[tbl.Hole](holeNumber, roundID)\n" +
+                        "VALUES ('" + holeNumber + "', " + roundID + ")";
+
+                PreparedStatement statement = connection.prepareStatement(query);
+                int affectedRows = statement.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Insert Failed. No rows updated");
+                }
+                holeID = new StringBuilder().append(holeNumber).append(roundID).toString();
+
+            } else {
+                String connectionResult = "Check Connection";
+            }
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+        }
+    }
+
+    // adds a new record to tbl.Shots in database
+    private void insertShot(String clubID) {
+        String UID = GlobalVariables.getInstance().getUid();
+        System.out.println(clubID +"   "+distance+"    "+UID+"   "+shotNumber+"   "+holeID);
+        try {
+            DatabaseConnector databaseConnector = new DatabaseConnector();
+            Connection connection = databaseConnector.connectionClass();
+            if (connection != null) {
+
+                String query = "INSERT INTO dbo.[tbl.Shots](clubID, distance, UID, shotNumber, holeID)\n" +
+                        "VALUES ('" + clubID + "', " + distance + ", '" + UID + "', " + shotNumber + ", " + holeID + ")";
+
+                PreparedStatement statement = connection.prepareStatement(query);
+                int affectedRows = statement.executeUpdate();
+                if (affectedRows == 0) {
+                    throw new SQLException("Insert Failed. No rows updated");
+                }
+            } else {
+                String connectionResult = "Check Connection";
+            }
+        } catch (Exception e) {
+            Log.e("Error", e.getMessage());
+        }
     }
 }

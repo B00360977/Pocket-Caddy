@@ -14,20 +14,19 @@ import android.view.ViewGroup;
 import android.widget.TableLayout;
 import android.widget.TableRow;
 import android.widget.TextView;
-
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 
-import javax.xml.transform.Result;
+/**
+ * This class displays all the rounds assosciated with the user
+ */
 
 public class RoundResultsActivity extends AppCompatActivity {
 
-    private TextView textView;
     private String roundID, courseName, roundDate;
     private TableLayout tableLayout;
-    Connection connection;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,12 +67,13 @@ public class RoundResultsActivity extends AppCompatActivity {
         finish();
     }
 
-    public ResultSet getRoundDetails(String roundDetails) {
+    // gets the rounds for the user from the database
+    private ResultSet getRoundDetails(String roundDetails) {
 
         ResultSet resultSet = null;
         try {
             DatabaseConnector databaseConnector = new DatabaseConnector();
-            connection = databaseConnector.connectionClass();
+            Connection connection = databaseConnector.connectionClass();
             if (connection != null) {
                 String query = "SELECT dbo.[tbl.Hole].holeNumber, dbo.[tbl.Hole].numberOfShots\n" +
                 "FROM         dbo.[tbl.Round] INNER JOIN\n" +
@@ -94,7 +94,8 @@ public class RoundResultsActivity extends AppCompatActivity {
         return resultSet;
     }
 
-    public void populateTableData(ResultSet data) {
+    // update the screen with the retrieved data
+    private void populateTableData(ResultSet data) {
 
         while (true) {
             try {
