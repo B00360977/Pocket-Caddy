@@ -16,5 +16,13 @@ This works by creating models that are trained of the users specific data so the
 
 A demo of the app can be found [here](https://studentmailuwsac-my.sharepoint.com/:v:/g/personal/b00360997_studentmail_uws_ac_uk/EQ78vlaAd-9OtZyXHsLfA-8BG1qDpahbebRlf7zl6oMkyA?e=2vRvY3)
 
+A dependencies may need to be manuallay installed. It is jtds-1.3.1
+The jar file can be found here - https://sourceforge.net/projects/jtds/files/jtds/1.3.1/
+Place the file in local machine and add to build.gradle file as shown below
+
+dependencies {
+ implementation files('{PATH_TO_FILE}\\jtds-1.3.1.jar')
+}
+
 
 _Owner - Kyle Kennedy_
